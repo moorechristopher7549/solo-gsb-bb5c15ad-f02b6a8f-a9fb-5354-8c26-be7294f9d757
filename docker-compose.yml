@@ -1,0 +1,11 @@
+# CueFlow · 舞台演出提示链编排
+# 单条命令启动：docker compose up --build
+# 浏览器访问：http://localhost:8080
+services:
+  cueflow:
+    build: .
+    image: cueflow:latest
+    container_name: cueflow
+    ports:
+      - "8080:80"
+    restart: unless-stopped

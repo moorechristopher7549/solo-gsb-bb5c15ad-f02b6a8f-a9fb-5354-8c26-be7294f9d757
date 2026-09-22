@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "exportedAt": "2026-09-21T00:00:00.000Z",
+  "nodes": [
+    { "id": "n1", "type": "lighting", "label": "开场暖场光", "duration": 4, "delay": 0, "resource": "追光1", "position": { "x": 60, "y": 60 } },
+    { "id": "n2", "type": "sound", "label": "开场音乐", "duration": 6, "delay": 0, "resource": "", "position": { "x": 60, "y": 220 } },
+    { "id": "n3", "type": "actor", "label": "主持人上场", "duration": 3, "delay": 1, "resource": "麦克风A", "position": { "x": 380, "y": 140 } },
+    { "id": "n4", "type": "lighting", "label": "追光定位", "duration": 5, "delay": 0, "resource": "追光1", "position": { "x": 700, "y": 40 } },
+    { "id": "n5", "type": "sound", "label": "掌声音效", "duration": 2, "delay": 0, "resource": "", "position": { "x": 700, "y": 220 } },
+    { "id": "n6", "type": "actor", "label": "全体谢幕", "duration": 4, "delay": 2, "resource": "", "position": { "x": 1020, "y": 140 } },
+    { "id": "n7", "type": "lighting", "label": "收场追光", "duration": 8, "delay": 0, "resource": "追光1", "position": { "x": 1340, "y": 60 } },
+    { "id": "n8", "type": "actor", "label": "主持人口播", "duration": 3, "delay": 0, "resource": "麦克风A", "position": { "x": 700, "y": 360 } }
+  ],
+  "edges": [
+    { "id": "e-n1-n3", "source": "n1", "target": "n3" },
+    { "id": "e-n2-n3", "source": "n2", "target": "n3" },
+    { "id": "e-n3-n4", "source": "n3", "target": "n4" },
+    { "id": "e-n3-n5", "source": "n3", "target": "n5" },
+    { "id": "e-n3-n8", "source": "n3", "target": "n8" },
+    { "id": "e-n4-n6", "source": "n4", "target": "n6" },
+    { "id": "e-n5-n6", "source": "n5", "target": "n6" },
+    { "id": "e-n6-n7", "source": "n6", "target": "n7" }
+  ]
+}
