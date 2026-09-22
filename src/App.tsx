@@ -371,7 +371,7 @@ export default function App() {
           />
         </aside>
       </div>
-      {rehearsal ? <ReplayBar replay={replay} totalDuration={schedule.totalDuration} /> : null}
+      {rehearsal ? <ReplayBar replay={replay} totalDuration={schedule.totalDuration} onToast={showToast} /> : null}
     </div>
   );
 }

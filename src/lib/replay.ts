@@ -13,6 +13,11 @@
  * 因为状态是当前时刻的纯函数，暂停 / 继续 / 拖动跳转后只需重算快照，
  * 已完成节点天然不会被再次置为进行中；是否再次产生「到点提示」
  * 则由 useReplay 中的已触发集合单独控制。
+ *
+ * 循环区间（LoopRegion）：入点 / 出点均为演出时钟秒数。启用循环后，
+ * 时钟越过出点即回退到入点进入下一轮；回退时仅「区间内」的提示
+ * （入点 <= 触发时刻 < 出点）重新武装、按轮重新触发，区间外已完成
+ * 提示仍不可重复。总时长变化时用 clampLoopRegion 校正越界区间。
  */
 import type { ScheduleResult } from './schedule';
 import type { CueType, ReplayStatus } from '../types';
@@ -103,6 +108,30 @@ export function firedBefore(timeline: TimelineEntry[], t: number): string[] {
     if (e.start < t - EPS) ids.push(e.nodeId);
   }
   return ids;
+}
+
+/** 循环区间（秒）：播放到出点后自动回到入点继续 */
+export interface LoopRegion {
+  /** 入点（秒，含）：区间下界，触发时刻 >= 入点的提示属于区间内 */
+  start: number;
+  /** 出点（秒，不含）：时钟越过该时刻即回退到入点 */
+  end: number;
+}
+
+/** 循环区间最小长度（秒）：避免零长 / 过短区间导致回退空转 */
+export const MIN_LOOP_LENGTH = 0.1;
+
+/**
+ * 将循环区间夹取到 [0, total]（导入或编辑节点导致总时长变化后调用）：
+ * 越界的入点 / 出点被拉回范围内；夹取后区间长度不足最小长度
+ * （或总时长为 0）时返回 null，表示区间已失效应被清除。
+ */
+export function clampLoopRegion(region: LoopRegion, total: number): LoopRegion | null {
+  if (!Number.isFinite(total) || total <= 0) return null;
+  const start = Math.min(Math.max(0, region.start), total);
+  const end = Math.min(Math.max(0, region.end), total);
+  if (end - start < MIN_LOOP_LENGTH - EPS) return null;
+  return { start, end };
 }
 
 /** 将秒数格式化为演出时钟：M:SS.s（超过 1 小时为 H:MM:SS.s） */

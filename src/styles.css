@@ -1071,3 +1071,96 @@ body {
   border-radius: 3px;
   background: transparent;
 }
+
+/* ---------- 循环区间 ---------- */
+.replay-loop {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-loop-pt {
+  padding: 7px 9px;
+}
+
+.btn-loop-toggle.loop-on {
+  border-color: rgba(73, 194, 104, 0.65);
+  background: rgba(73, 194, 104, 0.16);
+  color: #b9f0c7;
+  font-weight: 700;
+}
+
+.btn-loop-toggle.loop-on:hover:not(:disabled) {
+  border-color: #49c268;
+  background: rgba(73, 194, 104, 0.24);
+}
+
+.replay-loop-info {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.replay-loop-info.loop-active {
+  color: #b9f0c7;
+  font-weight: 600;
+}
+
+/* 时间轴轨道：循环条 + 拖动条上下叠放 */
+.replay-track {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.replay-loop-strip {
+  position: relative;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  cursor: crosshair;
+  user-select: none;
+  touch-action: none;
+}
+
+.replay-loop-strip.strip-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.replay-loop-region {
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  border-radius: 4px;
+  background: rgba(73, 194, 104, 0.3);
+  border: 1px solid rgba(73, 194, 104, 0.75);
+  pointer-events: none;
+}
+
+.replay-loop-region.region-disabled {
+  background: rgba(139, 150, 173, 0.22);
+  border-color: rgba(139, 150, 173, 0.55);
+}
+
+.replay-loop-region.region-drag {
+  background: rgba(110, 168, 254, 0.3);
+  border-color: rgba(110, 168, 254, 0.8);
+}
+
+/* 到点提示上的循环轮次标记 */
+.alert-iter {
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 700;
+  color: #b9f0c7;
+  background: rgba(73, 194, 104, 0.16);
+  border: 1px solid rgba(73, 194, 104, 0.4);
+  border-radius: 7px;
+  padding: 0 5px;
+}
