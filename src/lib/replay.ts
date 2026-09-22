@@ -105,6 +105,61 @@ export function firedBefore(timeline: TimelineEntry[], t: number): string[] {
   return ids;
 }
 
+/** 可编辑的循环区间（秒，演出时钟）；有效区间满足 0 <= inPoint < outPoint */
+export interface LoopRegion {
+  inPoint: number;
+  outPoint: number;
+}
+
+/** 区间是否有效（长度严格为正，区间边界采用 EPS 判定，避免浮点抖动） */
+export function isValidLoopRegion(
+  loop: { inPoint: number; outPoint: number } | null | undefined,
+): loop is LoopRegion {
+  return !!loop && loop.inPoint + EPS < loop.outPoint;
+}
+
+/**
+ * 规范化循环区间：
+ * - 总时长为 0（空画布）时不存在有效区间；
+ * - 边界夹取到 [0, total]；
+ * - 入点晚于出点时自动交换（常见 A/B 循环编辑约定，无需拒绝操作）；
+ * - 退化为空区间（in == out）时视为无效。
+ */
+export function normalizeLoopRegion(
+  raw: { inPoint: number; outPoint: number } | null | undefined,
+  total: number,
+): LoopRegion | null {
+  if (!raw) return null;
+  const max = Math.max(0, total);
+  if (max <= 0) return null;
+  const clamp = (v: number) => Math.min(max, Math.max(0, v));
+  let inPoint = clamp(raw.inPoint);
+  let outPoint = clamp(raw.outPoint);
+  if (inPoint > outPoint) [inPoint, outPoint] = [outPoint, inPoint];
+  return inPoint + EPS < outPoint ? { inPoint, outPoint } : null;
+}
+
+/**
+ * 循环回退（出点 -> 入点）时，应「解除已触发登记」的节点 id：
+ * 触发时刻落在循环区间内的节点（[inPoint, outPoint]，端点均包含）。
+ *
+ * - 恰在入点上的节点：回退后时钟位于入点，它属于即将开始的新一轮，
+ *   解除登记后，下一帧推进（advance 收集 start > from 的节点）会重新触发，
+ *   每轮恰好一次——整场循环（inPoint = 0）时 T+0 的提示也照样重响；
+ * - 恰在出点上的节点：它在到达出点的那一帧刚刚触发过，下一轮同样再次触发；
+ * - 同一轮内不会重复：首次触发后即留在已触发集合中，直到下一次回退才解除；
+ * - 区间外（入点之前、出点之后）的节点不在其中，已完成提示永不重复。
+ */
+export function loopFiredIds(timeline: TimelineEntry[], loop: LoopRegion): string[] {
+  const ids: string[] = [];
+  for (const e of timeline) {
+    if (e.start + EPS >= loop.inPoint && e.start <= loop.outPoint + EPS) {
+      ids.push(e.nodeId);
+    }
+  }
+  return ids;
+}
+
 /** 将秒数格式化为演出时钟：M:SS.s（超过 1 小时为 H:MM:SS.s） */
 export function formatClock(t: number): string {
   const total = Math.max(0, Number.isFinite(t) ? t : 0);
